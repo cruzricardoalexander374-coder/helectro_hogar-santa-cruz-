@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="Electro Hogar - Los mejores electrodomésticos al mejor precio. Neveras, freidoras, fogones, ventiladores y más.">
+<meta property="og:title" content="Electro Hogar - Electrodomésticos">
+<meta property="og:description" content="Encuentra neveras, freidoras, fogones, ventiladores y más al mejor precio.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://picsum.photos/seed/electrohogar/1200/630">
+<title>Electro Hogar</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden;min-height:100dvh;padding-bottom:80px}
+::-webkit-scrollbar{width:0;height:0}
+.page{display:none;animation:fadeUp .3s ease}.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;display:none;animation:fadeIn .2s ease;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex;align-items:flex-end;justify-content:center}
+.modal-sheet{background:#141414;border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-height:92dvh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.22,1,.36,1)}
+.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:90%;max-width:400px}
+.toast{padding:14px 18px;border-radius:12px;font-size:13px;font-weight:500;animation:fadeUp .3s ease;pointer-events:auto;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.toast.success{background:#052e16;border:1px solid #166534;color:#4ade80}
+.toast.error{background:#2a0a0a;border:1px solid #7f1d1d;color:#f87171}
+.toast.info{background:#0a1a2a;border:1px solid #1e3a5f;color:#60a5fa}
+.chip{padding:8px 16px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;transition:all .2s;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#a8a29e;flex-shrink:0}
+.chip.active{background:#f97316;border-color:#f97316;color:#fff}
+.product-card{background:#141414;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);transition:all .2s;cursor:pointer}
+.product-card:active{transform:scale(.97)}
+.product-img{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#111}
+.product-img img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:10px;left:10px;padding:4px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.badge-ok{background:#052e16;color:#4ade80;border:1px solid #166534}
+.badge-wait{background:#2a1a00;color:#fbbf24;border:1px solid #854d0e}
+.badge-feat{position:absolute;top:10px;right:10px;background:#f97316;color:#fff;padding:4px 8px;border-radius:99px;font-size:9px;font-weight:700}
+.input-field{width:100%;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+.input-field:focus{border-color:#f97316}
+.input-field::placeholder{color:#57534e}
+select.input-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a8a29e' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select.input-field option{background:#141414;color:#fff}
+textarea.input-field{resize:vertical;min-height:80px}
+.btn-primary{width:100%;padding:16px;background:#f97316;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
+.btn-primary:active{transform:scale(.97);background:#ea580c}
+.btn-secondary{width:100%;padding:16px;background:rgba(255,255,255,.05);color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:14px;font-size:15px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
+.btn-secondary:active{transform:scale(.97);background:rgba(255,255,255,.1)}
+.btn-danger{width:100%;padding:14px;background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2);border-radius:14px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
+.btn-danger:active{transform:scale(.97);background:rgba(239,68,68,.2)}
+.qty-btn{width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0}
+.qty-btn:active{background:rgba(255,255,255,.15);transform:scale(.9)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;cursor:pointer;transition:color .2s;flex:1;position:relative}
+.nav-item.active{color:#f97316}
+.nav-item.active::before{content:'';position:absolute;top:-1px;left:25%;right:25%;height:2px;background:#f97316;border-radius:99px}
+.nav-item span{font-size:10px;font-weight:500}
+.fab-wa{position:fixed;bottom:90px;right:16px;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:40;box-shadow:0 4px 20px rgba(37,211,102,.4);cursor:pointer;transition:all .2s}
+.fab-wa:active{transform:scale(.9)}
+.admin-tab{padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;border:1px solid rgba(255,255,255,.06)}
+.admin-tab.active{background:rgba(249,115,22,.15);color:#f97316;border-color:rgba(249,115,22,.3)}
+.admin-tab:not(.active){background:rgba(255,255,255,.03);color:#78716c}
+.order-card{background:#1a1a1a;border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,.06)}
+.toggle{width:48px;height:28px;border-radius:99px;background:rgba(255,255,255,.1);cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:#f97316}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle.on::after{transform:translateX(20px)}
+.cat-sel{padding:12px 8px;border-radius:12px;border:2px solid rgba(255,255,255,.06);text-align:center;cursor:pointer;transition:all .2s;font-size:11px;font-weight:600}
+.cat-sel.selected{border-color:#f97316;background:rgba(249,115,22,.1);color:#f97316}
+.img-prev{width:100%;aspect-ratio:16/9;border-radius:12px;border:2px dashed rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;transition:border-color .2s;background:rgba(255,255,255,.02)}
+.img-prev:hover{border-color:rgba(255,255,255,.2)}
+.img-prev img{width:100%;height:100%;object-fit:cover}
+.stat-card{background:#1a1a1a;border-radius:14px;padding:16px 12px;text-align:center;border:1px solid rgba(255,255,255,.06)}
+.stat-num{font-size:24px;font-weight:700;line-height:1}.stat-label{font-size:10px;color:#78716c;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
+.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- ENCABEZADO -->
+  <header class="sticky top-0 z-30 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5">
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="goTo('home')">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center">
+          <i data-lucide="zap" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold leading-tight" id="hdr-name">Electro Hogar</h1>
+          <p class="text-[10px] text-stone-500 font-medium">Electrodomésticos y más</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSearch()" class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5"><i data-lucide="search" class="w-4 h-4 text-stone-400"></i></button>
+        <button onclick="goTo('admin')" class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5"><i data-lucide="lock" class="w-4 h-4 text-stone-400"></i></button>
+      </div>
+    </div>
+    <div id="search-bar" class="px-4 pb-3 hidden">
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 text-stone-500 absolute left-4 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="search-input" class="input-field pl-11" placeholder="Buscar productos..." oninput="doSearch(this.value)">
+        <button onclick="toggleSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PÁGINAS -->
+  <main class="px-4 pt-4">
+    <!-- INICIO -->
+    <div id="pg-home" class="page active">
+      <div class="flex gap-2 overflow-x-auto pb-4 -mx-4 px-4 no-scrollbar" id="cat-chips"></div>
+      <div id="prod-grid" class="grid grid-cols-2 gap-3 pb-4"></div>
+      <div id="empty-msg" class="hidden text-center py-16">
+        <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4"><i data-lucide="package-x" class="w-8 h-8 text-stone-700"></i></div>
+        <p class="text-stone-500 font-medium">No se encontraron productos</p>
+      </div>
+    </div>
+
+    <!-- DETALLE -->
+    <div id="pg-detail" class="page"><div id="detail-body"></div></div>
+
+    <!-- MIS ENCARGOS -->
+    <div id="pg-orders" class="page">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold">Mis Encargos</h2>
+        <button onclick="clearMyOrders()" class="text-xs text-stone-500 font-medium px-3 py-1.5 rounded-lg bg-white/5">Limpiar</button>
+      </div>
+      <div id="my-orders"></div>
+      <div id="my-orders-empty" class="text-center py-16">
+        <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4"><i data-lucide="shopping-bag" class="w-8 h-8 text-stone-700"></i></div>
+        <p class="text-stone-500 font-medium mb-1">Sin encargos</p>
+        <p class="text-stone-600 text-sm">Tus encargos aparecerán aquí</p>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div id="pg-admin" class="page">
+      <div id="admin-login" class="py-12">
+        <div class="text-center mb-8">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-700/20 border border-orange-500/20 flex items-center justify-center mx-auto mb-4"><i data-lucide="shield-check" class="w-8 h-8 text-orange-500"></i></div>
+          <h2 class="text-xl font-bold mb-1">Panel de Administración</h2>
+          <p class="text-stone-500 text-sm">Ingresa tu PIN para acceder</p>
+        </div>
+        <div class="max-w-xs mx-auto">
+          <input type="password" id="pin-in" class="input-field text-center text-2xl tracking-[.5em] font-bold mb-4" placeholder="····" maxlength="6" inputmode="numeric" onkeydown="if(event.key==='Enter')login()">
+          <button onclick="login()" class="btn-primary">Ingresar</button>
+          <p class="text-center text-stone-600 text-xs mt-4">PIN por defecto: <span class="text-stone-400">2025</span></p>
+        </div>
+      </div>
+      <div id="admin-dash" class="hidden">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold">Administración</h2>
+          <button onclick="logout()" class="text-xs text-stone-500 font-medium px-3 py-1.5 rounded-lg bg-white/5 flex items-center gap-1"><i data-lucide="log-out" class="w-3 h-3"></i> Salir</button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mb-4" id="stats"></div>
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="admin-tab active" onclick="admTab('prods')" id="tab-prods">Productos</div>
+          <div class="admin-tab" onclick="admTab('ords')" id="tab-ords">Encargos</div>
+          <div class="admin-tab" onclick="admTab('conf')" id="tab-conf">Ajustes</div>
+        </div>
+        <div id="adm-prods">
+          <button onclick="openForm()" class="btn-primary mb-4 flex items-center justify-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> Agregar Producto</button>
+          <div id="adm-prod-list"></div>
+        </div>
+        <div id="adm-ords" class="hidden">
+          <div id="adm-ord-list"></div>
+          <div id="adm-ord-empty" class="text-center py-12"><div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-3"><i data-lucide="inbox" class="w-6 h-6 text-stone-700"></i></div><p class="text-stone-500 text-sm">No hay encargos</p></div>
+        </div>
+        <div id="adm-conf" class="hidden"><div id="adm-conf-body" class="space-y-4"></div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- NAVEGACIÓN INFERIOR -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 z-30">
+    <div class="flex max-w-lg mx-auto">
+      <div class="nav-item active" onclick="goTo('home')" id="nv-home"><i data-lucide="home" class="w-5 h-5"></i><span>Inicio</span></div>
+      <div class="nav-item" onclick="goTo('orders')" id="nv-orders"><i data-lucide="shopping-bag" class="w-5 h-5"></i><span>Encargos</span></div>
+      <div class="nav-item" onclick="goTo('admin')" id="nv-admin"><i data-lucide="settings" class="w-5 h-5"></i><span>Ajustes</span></div>
+    </div>
+  </nav>
+
+  <!-- BOTÓN WHATSAPP FLOTANTE -->
+  <a id="fab-wa" class="fab-wa" href="#" target="_blank" rel="noopener">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+</div>
+
+<!-- VENTANA MODAL -->
+<div class="modal-overlay" id="modal-bg" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet" id="modal-sheet"></div>
+</div>
+
+<!-- CONTENEDOR DE NOTIFICACIONES -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- CAMPO OCULTO PARA IMÁGENES -->
+<input type="file" id="file-in" accept="image/*" class="hidden" onchange="onFile(event)">
+
+<script>
+// ========== CONFIGURACIÓN ==========
+const CATS = {
+  all:{n:'Todos',ic:'layout-grid',c:'#f97316'},
+  neveras:{n:'Neveras',ic:'thermometer-snowflake',c:'#3b82f6'},
+  frios:{n:'Frios',ic:'snowflake',c:'#06b6d4'},
+  freidoras:{n:'Freidoras',ic:'flame',c:'#f97316'},
+  sartenes:{n:'Sartenes',ic:'circle-dot',c:'#eab308'},
+  fogones:{n:'Fogones',ic:'flame-kindling',c:'#ef4444'},
+  ventiladores:{n:'Ventiladores',ic:'fan',c:'#22c55e'},
+  comida:{n:'Comida',ic:'utensils',c:'#a855f7'}
+};
+
+const ESTADOS = {
+  pendiente:{l:'Pendiente',c:'#fbbf24'},
+  confirmado:{l:'Confirmado',c:'#60a5fa'},
+  entregado:{l:'Entregado',c:'#4ade80'},
+  cancelado:{l:'Cancelado',c:'#f87171'}
+};
+
+// ========== DATOS POR DEFECTO ==========
+const DATOS_INICIALES = {
+  config:{nombreTienda:'Electro Hogar',telefono:'0000000000',pin:'2025',moneda:'$',mensajeBienvenida:'¡Bienvenido a Electro Hogar! Los mejores electrodomésticos al mejor precio.'},
+  productos:[
+    {id:'p1',nombre:'Nevera Samsung 14 pies',precio:45000,categoria:'neveras',disponible:true,tiempoLlegada:'',garantia:'1 año',descripcion:'Nevera de dos puertas con freezer superior. Eficiente consumo energético.',imagen:'',destacado:true},
+    {id:'p2',nombre:'Nevera LG 18 pies',precio:58000,categoria:'neveras',disponible:true,tiempoLlegada:'',garantia:'1 año',descripcion:'Nevera grande con dispensador de agua. Sistema Smart Cooling.',imagen:'',destacado:false},
+    {id:'p3',nombre:'Nevera Mabe 12 pies',precio:32000,categoria:'neveras',disponible:false,tiempoLlegada:'5 días hábiles',garantia:'6 meses',descripcion:'Nevera compacta ideal para espacios pequeños.',imagen:'',destacado:false},
+    {id:'p4',nombre:'Congelador Horizontal 7 pies',precio:28000,categoria:'frios',disponible:true,tiempoLlegada:'',garantia:'1 año',descripcion:'Congelador horizontal con cesta interior. Gran capacidad de almacenamiento.',imagen:'',destacado:true},
+    {id:'p5',nombre:'Mini Nevera 3 pies',precio:15000,categoria:'frios',disponible:true,tiempoLlegada:'',garantia:'6 meses',descripcion:'Mini nevera perfecta para cuarto u oficina.',imagen:'',destacado:false},
+    {id:'p6',nombre:'Freidora de Aire 4L',precio:5500,categoria:'freidoras',disponible:true,tiempoLlegada:'',garantia:'6 meses',descripcion:'Freidora de aire con temporizador y control de temperatura digital.',imagen:'',destacado:true},
+    {id:'p7',nombre:'Freidora de Aire 6L',precio:7500,categoria:'freidoras',disponible:false,tiempoLlegada:'3 días hábiles',garantia:'6 meses',descripcion:'Freidora de aire grande para familias. Panel táctil.',imagen:'',destacado:false},
+    {id:'p8',nombre:'Sartén Antiadherente 24cm',precio:1800,categoria:'sartenes',disponible:true,tiempoLlegada:'',garantia:'3 meses',descripcion:'Sartén antiadherente con mango anticalor. apta para todo tipo de cocinas.',imagen:'',destacado:false},
+    {id:'p9',nombre:'Set de Sartenes 3 piezas',precio:4200,categoria:'sartenes',disponible:true,tiempoLlegada:'',garantia:'6 meses',descripcion:'Juego de 3 sartenes de 18, 22 y 26 cm. Revestimiento cerámico.',imagen:'',destacado:true},
+    {id:'p10',nombre:'Fogón 4 Quemadores',precio:12000,categoria:'fogones',disponible:true,tiempoLlegada:'',garantia:'1 año',descripcion:'Fogón a gas de 4 quemadores con horno. Quemadores de alta eficiencia.',imagen:'',destacado:false},
+    {id:'p11',nombre:'Fogón 2 Quemadores',precio:6500,categoria:'fogones',disponible:true,tiempoLlegada:'',garantia:'6 meses',descripcion:'Fogón compacto de 2 quemadores. Ideal para espacios reducidos.',imagen:'',destacado:false},
+    {id:'p12',nombre:'Fogón Inducción 2 Zonas',precio:9800,categoria:'fogones',disponible:false,tiempoLlegada:'7 días hábiles',garantia:'1 año',descripcion:'Fogón de inducción con 2 zonas de cocción. Timer y control táctil.',imagen:'',destacado:false},
+    {id:'p13',nombre:'Ventilador de Torre 40"',precio:8500,categoria:'ventiladores',disponible:true,tiempoLlegada:'',garantia:'6 meses',descripcion:'Ventilador de torre con 3 velocidades y oscilación. Muy silencioso.',imagen:'',destacado:true},
+    {id:'p14',nombre:'Ventilador de Pie 18"',precio:4800,categoria:'ventiladores',disponible:true,tiempoLlegada:'',garantia:'6 meses',descripcion:'Ventilador de pie con 3 velocidades. Altura regulable.',imagen:'',destacado:false},
+    {id:'p15',nombre:'Ventilador de Techo 52"',precio:14000,categoria:'ventiladores',disponible:false,tiempoLlegada:'10 días hábiles',garantia:'1 año',descripcion:'Ventilador de techo con luz LED incluida. Control remoto.',imagen:'',destacado:false},
+    {id:'p16',nombre:'Paquete de Harina PAN 1kg',precio:800,categoria:'comida',disponible:true,tiempoLlegada:'',garantia:'',descripcion:'Harina de maíz precocida. Bolsa de 1 kilogramo.',imagen:'',destacado:false},
+    {id:'p17',nombre:'Aceite Vegetal 3L',precio:2200,categoria:'comida',disponible:true,tiempoLlegada:'',garantia:'',descripcion:'Aceite vegetal de soya. Botella de 3 litros.',imagen:'',destacado:false},
+    {id:'p18',nombre:'Arroz 5kg',precio:1500,categoria:'comida',disponible:false,tiempoLlegada:'2 días hábiles',garantia:'',descripcion:'Arroz tipo 1 de 5 kilogramos. Grano largo.',imagen:'',destacado:false}
+  ],
+  encargos:[]
+};
+
+// ========== ESTADO DE LA APLICACIÓN ==========
+let S = {cat:'all',search:'',page:'home',editId:null,imgTemp:'',admIn:false};
+
+// ========== ALMACENAMIENTO ==========
+function load(){
+  try{
+    const d=localStorage.getItem('eh_data');
+    if(d) return JSON.parse(LZString.decompressFromUTF16(d));
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DATOS_INICIALES));
+}
+function save(){try{localStorage.setItem('eh_data',LZString.compressToUTF16(JSON.stringify(D)));}catch(e){toast('Error al guardar datos','error');}}
+let D = load();
+
+// ========== NOTIFICACIONES ==========
+function toast(msg,type='info'){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  const icons={success:'check-circle',error:'alert-circle',info:'info'};
+  t.innerHTML=`<i data-lucide="${icons[type]||'info'}" class="w-4 h-4 flex-shrink-0"></i><span>${msg}</span>`;
+  c.appendChild(t);
+  lucide.createIcons({attrs:{class:'w-4 h-4'},nameAttr:'data-lucide'},t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);
+}
+
+// ========== NAVEGACIÓN ==========
+function goTo(p){
+  S.page=p;
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.getElementById('pg-'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  const nv=document.getElementById('nv-'+p);
+  if(nv)nv.classList.add('active');
+  document.getElementById('fab-wa').style.display=p==='detail'?'none':'flex';
+  window.scrollTo(0,0);
+  if(p==='home')renderHome();
+  if(p==='orders')renderMyOrders();
+  if(p==='admin'&&!S.admIn){document.getElementById('admin-login').classList.remove('hidden');document.getElementById('admin-dash').classList.add('hidden');}
+  if(p==='admin'&&S.admIn)renderAdmin();
+  lucide.createIcons();
+}
+
+// ========== BÚSQUEDA ==========
+function toggleSearch(){
+  const b=document.getElementById('search-bar');
+  b.classList.toggle('hidden');
+  if(!b.classList.contains('hidden'))document.getElementById('search-input').focus();
+  else{document.getElementById('search-input').value='';S.search='';renderHome();}
+}
+function doSearch(v){S.search=v.toLowerCase();renderHome();}
+
+// ========== FORMATEAR PRECIO ==========
+function fmt(p){return D.config.moneda+Number(p).toLocaleString('es-ES');}
+
+// ========== IMAGEN DE PRODUCTO ==========
+function prodImg(p,size=400){
+  if(p.imagen)return p.imagen;
+  const seed=p.nombre.replace(/\s/g,'').substring(0,15)+p.id;
+  return `https://picsum.photos/seed/${seed}/${size}/${size}`;
+}
+
+// ========== RENDERIZAR INICIO ==========
+function renderHome(){
+  // Encabezado
+  document.getElementById('hdr-name').textContent=D.config.nombreTienda;
+  // WhatsApp flotante
+  document.getElementById('fab-wa').href='https://wa.me/'+D.config.telefono;
+  // Categorías
+  let chips='<div class="chip '+(S.cat==='all'?'active':'')+'" onclick="filterCat(\'all\')">Todos</div>';
+  for(const[k,v]of Object.entries(CATS)){
+    if(k==='all')continue;
+    chips+=`<div class="chip ${S.cat===k?'active':''}" onclick="filterCat('${k}')">${v.n}</div>`;
+  }
+  document.getElementById('cat-chips').innerHTML=chips;
+  // Productos filtrados
+  let prods=D.productos.slice();
+  if(S.cat!=='all')prods=prods.filter(p=>p.categoria===S.cat);
+  if(S.search)prods=prods.filter(p=>p.nombre.toLowerCase().includes(S.search)||p.categoria.toLowerCase().includes(S.search));
+  // Destacados primero
+  prods.sort((a,b)=>(b.destacado?1:0)-(a.destacado?1:0));
+  const grid=document.getElementById('prod-grid');
+  const empty=document.getElementById('empty-msg');
+  if(!prods.length){grid.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  grid.innerHTML=prods.map(p=>`
+    <div class="product-card" onclick="openDetail('${p.id}')">
+      <div class="product-img">
+        <img src="${prodImg(p)}" alt="${p.nombre}" loading="lazy" onerror="this.src='https://picsum.photos/seed/fallback${p.id}/400/400'">
+        <div class="badge ${p.disponible?'badge-ok':'badge-wait'}">${p.disponible?'Disponible':'Agotado'}</div>
+        ${p.destacado?'<div class="badge-feat">Destacado</div>':''}
+      </div>
+      <div class="p-3">
+        <p class="text-[11px] font-semibold uppercase tracking-wider mb-1" style="color:${CATS[p.categoria]?.c||'#78716c'}">${CATS[p.categoria]?.n||p.categoria}</p>
+        <h3 class="text-sm font-semibold leading-tight mb-2 line-clamp-2" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.nombre}</h3>
+        <p class="text-base font-bold text-orange-500">${fmt(p.precio)}</p>
+        ${!p.disponible?`<p class="text-[11px] text-yellow-500/80 mt-1 font-medium">Llega en: ${p.tiempoLlegada}</p>`:''}
+      </div>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+function filterCat(c){S.cat=c;renderHome();}
+
+// ========== DETALLE DE PRODUCTO ==========
+function openDetail(id){
+  const p=D.productos.find(x=>x.id===id);
+  if(!p)return;
+  const catInfo=CATS[p.categoria]||{n:p.categoria,c:'#78716c'};
+  document.getElementById('detail-body').innerHTML=`
+    <button onclick="goTo('home')" class="flex items-center gap-2 text-stone-400 text-sm font-medium mb-4"><i data-lucide="arrow-left" class="w-4 h-4"></i> Volver</button>
+    <div class="rounded-2xl overflow-hidden mb-4 bg-[#111]"><img src="${prodImg(p,600)}" alt="${p.nombre}" class="w-full aspect-square object-cover" onerror="this.src='https://picsum.photos/seed/fallback${p.id}/600/600'"></div>
+    <div class="flex items-center gap-2 mb-2">
+      <span class="text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md" style="background:${catInfo.c}20;color:${catInfo.c}">${catInfo.n}</span>
+      <span class="text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md ${p.disponible?'bg-green-500/10 text-green-400 border border-green-500/20':'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'}">${p.disponible?'Disponible':'Agotado'}</span>
+      ${p.destacado?'<span class="text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 border border-orange-500/20">Destacado</span>':''}
+    </div>
+    <h2 class="text-xl font-bold mb-2">${p.nombre}</h2>
+    <p class="text-2xl font-bold text-orange-500 mb-4">${fmt(p.precio)}</p>
+    ${p.garantia?`<div class="flex items-center gap-2 mb-4"><div class="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center"><i data-lucide="shield-check" class="w-4 h-4 text-green-400"></i></div><div><p class="text-xs text-stone-500 font-medium">Garantía</p><p class="text-sm font-semibold">${p.garantia}</p></div></div>`:''}
+    ${!p.disponible?`<div class="flex items-center gap-2 mb-4 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10"><div class="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4 text-yellow-400"></i></div><div><p class="text-xs text-stone-500 font-medium">Tiempo de llegada</p><p class="text-sm font-semibold text-yellow-400">${p.tiempoLlegada}</p></div></div>`:''}
+    <p class="text-stone-400 text-sm leading-relaxed mb-6">${p.descripcion}</p>
+    <button onclick="openOrder('${p.id}')" class="btn-primary flex items-center justify-center gap-2"><i data-lucide="shopping-bag" class="w-5 h-5"></i> Hacer Encargo</button>
+  `;
+  goTo('detail');
+  lucide.createIcons();
+}
+
+// ========== HACER ENCARGO ==========
+function openOrder(id){
+  const p=D.productos.find(x=>x.id===id);
+  if(!p)return;
+  const html=`
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold">Hacer Encargo</h3>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4 text-stone-400"></i></button>
+      </div>
+      <div class="flex gap-3 mb-5 p-3 rounded-xl bg-white/5">
+        <img src="${prodImg(p,100)}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://picsum.photos/seed/fallback${p.id}/100/100'">
+        <div class="min-w-0">
+          <p class="text-sm font-semibold truncate">${p.nombre}</p>
+          <p class="text-orange-500 font-bold">${fmt(p.precio)}</p>
+          ${!p.disponible?`<p class="text-xs text-yellow-400">Llega en: ${p.tiempoLlegada}</p>`:''}
+        </div>
+      </div>
+      <div class="space-y-3 mb-5">
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Tu nombre *</label><input type="text" id="ord-nombre" class="input-field" placeholder="Ej: María García"></div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Teléfono *</label><input type="tel" id="ord-tel" class="input-field" placeholder="Ej: 04141234567" inputmode="tel"></div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Cantidad</label>
+          <div class="flex items-center gap-3"><button class="qty-btn" onclick="chgQty(-1)">−</button><span id="ord-qty" class="text-lg font-bold w-10 text-center">1</span><button class="qty-btn" onclick="chgQty(1)">+</button></div>
+        </div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Nota (opcional)</label><textarea id="ord-nota" class="input-field" placeholder="Color, tamaño, dirección de entrega..." rows="2"></textarea></div>
+      </div>
+      <div class="p-3 rounded-xl bg-white/5 mb-5">
+        <div class="flex justify-between text-sm mb-1"><span class="text-stone-400">Precio unitario</span><span>${fmt(p.precio)}</span></div>
+        <div class="flex justify-between text-sm mb-1"><span class="text-stone-400">Cantidad</span><span id="ord-qty-show">1</span></div>
+        <div class="border-t border-white/10 mt-2 pt-2 flex justify-between"><span class="font-semibold">Total</span><span class="font-bold text-orange-500" id="ord-total">${fmt(p.precio)}</span></div>
+      </div>
+      <button onclick="submitOrder('${p.id}')" class="btn-primary flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Confirmar Encargo</button>
+      <button onclick="sendWhatsApp('${p.id}')" class="btn-secondary mt-3 flex items-center justify-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar por WhatsApp
+      </button>
+    </div>`;
+  openModal(html);
+}
+let orderQty=1;
+function chgQty(d){
+  orderQty=Math.max(1,orderQty+d);
+  document.getElementById('ord-qty').textContent=orderQty;
+  document.getElementById('ord-qty-show').textContent=orderQty;
+  const p=D.productos.find(x=>x.id===document.querySelector('#modal-sheet [onclick*="submitOrder"]')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1]);
+  if(p)document.getElementById('ord-total').textContent=fmt(p.precio*orderQty);
+}
+function submitOrder(pid){
+  const p=D.productos.find(x=>x.id===pid);if(!p)return;
+  const nombre=document.getElementById('ord-nombre').value.trim();
+  const tel=document.getElementById('ord-tel').value.trim();
+  const nota=document.getElementById('ord-nota').value.trim();
+  if(!nombre){toast('Ingresa tu nombre','error');return;}
+  if(!tel){toast('Ingresa tu teléfono','error');return;}
+  const orden={
+    id:'o'+Date.now(),
+    productoId:pid,
+    productoNombre:p.nombre,
+    productoImg:prodImg(p,100),
+    precio:p.precio,
+    cantidad:orderQty,
+    total:p.precio*orderQty,
+    nombre,telefono:tel,nota,
+    estado:'pendiente',
+    fecha:new Date().toLocaleString('es-ES'),
+    timestamp:Date.now()
+  };
+  D.encargos.unshift(orden);
+  save();
+  orderQty=1;
+  closeModal();
+  toast('Encargo registrado correctamente','success');
+}
+
+function sendWhatsApp(pid){
+  const p=D.productos.find(x=>x.id===pid);if(!p)return;
+  const nombre=document.getElementById('ord-nombre')?.value.trim()||'';
+  const tel=document.getElementById('ord-tel')?.value.trim()||'';
+  const nota=document.getElementById('ord-nota')?.value.trim()||'';
+  const total=p.precio*orderQty;
+  let msg=`*NUEVO ENCARGO*\n\n`;
+  msg+=`*Producto:* ${p.nombre}\n`;
+  msg+=`*Precio:* ${fmt(p.precio)}\n`;
+  msg+=`*Cantidad:* ${orderQty}\n`;
+  msg+=`*Total:* ${fmt(total)}\n`;
+  if(!p.disponible)msg+=`*Nota:* Producto agotado, llega en ${p.tiempoLlegada}\n`;
+  if(p.garantia)msg+=`*Garantía:* ${p.garantia}\n`;
+  msg+=`\n*Nombre:* ${nombre}\n`;
+  if(tel)msg+=`*Teléfono:* ${tel}\n`;
+  if(nota)msg+=`*Nota:* ${nota}\n`;
+  window.open('https://wa.me/'+D.config.telefono+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ========== MIS ENCARGOS ==========
+function renderMyOrders(){
+  const list=document.getElementById('my-orders');
+  const empty=document.getElementById('my-orders-empty');
+  if(!D.encargos.length){list.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  list.innerHTML=D.encargos.map(o=>{
+    const e=ESTADOS[o.estado]||ESTADOS.pendiente;
+    return `<div class="order-card mb-3">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex gap-3">
+          <img src="${o.productoImg}" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://picsum.photos/seed/fallback${o.id}/100/100'">
+          <div><p class="text-sm font-semibold">${o.productoNombre}</p><p class="text-xs text-stone-500">${o.fecha}</p></div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold px-2 py-1 rounded-md" style="background:${e.c}15;color:${e.c}">${e.l}</span>
+        <span class="text-sm font-bold text-orange-500">${fmt(o.total)} × ${o.cantidad}</span>
+      </div>
+      ${o.nota?`<p class="text-xs text-stone-500 mt-2 pt-2 border-t border-white/5">Nota: ${o.nota}</p>`:''}
+    </div>`;
+  }).join('');
+}
+function clearMyOrders(){D.encargos=[];save();renderMyOrders();toast('Encargos limpiados','info');}
+
+// ========== MODALES ==========
+function openModal(html){
+  document.getElementById('modal-sheet').innerHTML=html;
+  document.getElementById('modal-bg').classList.add('show');
+  document.body.style.overflow='hidden';
+  lucide.createIcons();
+}
+function closeModal(){
+  document.getElementById('modal-bg').classList.remove('show');
+  document.body.style.overflow='';
+  orderQty=1;
+}
+
+// ========== ADMIN - LOGIN ==========
+function login(){
+  const pin=document.getElementById('pin-in').value.trim();
+  if(pin===D.config.pin){
+    S.admIn=true;
+    document.getElementById('admin-login').classList.add('hidden');
+    document.getElementById('admin-dash').classList.remove('hidden');
+    document.getElementById('pin-in').value='';
+    renderAdmin();
+    toast('Bienvenido al panel de administración','success');
+  }else{
+    toast('PIN incorrecto','error');
+  }
+}
+function logout(){S.admIn=false;document.getElementById('admin-login').classList.remove('hidden');document.getElementById('admin-dash').classList.add('hidden');toast('Sesión cerrada','info');}
+
+// ========== ADMIN - TABS ==========
+function admTab(t){
+  ['prods','ords','conf'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('active',x===t);
+    document.getElementById('adm-'+x).classList.toggle('hidden',x!==t);
+  });
+  if(t==='ords')renderAdmOrders();
+  if(t==='conf')renderAdmConfig();
+  lucide.createIcons();
+}
+
+// ========== ADMIN - ESTADÍSTICAS ==========
+function renderStats(){
+  const total=D.productos.length;
+  const disp=D.productos.filter(p=>p.disponible).length;
+  const ords=D.encargos.length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Productos</div></div>
+    <div class="stat-card"><div class="stat-num text-green-400">${disp}</div><div class="stat-label">Disponibles</div></div>
+    <div class="stat-card"><div class="stat-num text-orange-400">${ords}</div><div class="stat-label">Encargos</div></div>`;
+}
+
+// ========== ADMIN - LISTA DE PRODUCTOS ==========
+function renderAdmProducts(){
+  renderStats();
+  const list=document.getElementById('adm-prod-list');
+  if(!D.productos.length){list.innerHTML='<p class="text-center text-stone-600 text-sm py-8">No hay productos. Agrega uno nuevo.</p>';return;}
+  list.innerHTML=D.productos.map(p=>{
+    const catInfo=CATS[p.categoria]||{n:p.categoria,c:'#78716c'};
+    return `<div class="order-card mb-3">
+      <div class="flex gap-3">
+        <img src="${prodImg(p,100)}" class="w-14 h-14 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://picsum.photos/seed/fallback${p.id}/100/100'">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold truncate">${p.nombre}</p>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-xs font-bold" style="color:${catInfo.c}">${catInfo.n}</span>
+            <span class="text-xs ${p.disponible?'text-green-400':'text-yellow-400'}">${p.disponible?'● Disponible':'● Agotado'}</span>
+          </div>
+          <p class="text-sm font-bold text-orange-500 mt-0.5">${fmt(p.precio)}</p>
+        </div>
+        <div class="flex flex-col gap-1 flex-shrink-0">
+          <button onclick="openForm('${p.id}')" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="pencil" class="w-3.5 h-3.5 text-stone-400"></i></button>
+          <button onclick="deleteProd('${p.id}')" class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-400"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+// ========== ADMIN - FORMULARIO PRODUCTO ==========
+function openForm(id=null){
+  S.editId=id;
+  S.imgTemp='';
+  const p=id?D.productos.find(x=>x.id===id):null;
+  let catHtml='';
+  for(const[k,v]of Object.entries(CATS)){
+    if(k==='all')continue;
+    catHtml+=`<div class="cat-sel ${(p&&p.categoria===k)?'selected':''}" onclick="selCat('${k}',this)" style="${(p&&p.categoria===k)?'border-color:'+v.c+';color:'+v.c:''}">${v.n}</div>`;
+  }
+  const html=`
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold">${p?'Editar Producto':'Nuevo Producto'}</h3>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><i data-lucide="x" class="w-4 h-4 text-stone-400"></i></button>
+      </div>
+      <div class="space-y-4">
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Imagen del producto</label>
+          <div class="img-prev" onclick="document.getElementById('file-in').click()" id="img-prev">
+            ${p&&p.imagen?`<img src="${p.imagen}" id="img-prev-img">`:`<div class="text-center" id="img-prev-ph"><i data-lucide="image-plus" class="w-8 h-8 text-stone-600 mx-auto mb-1"></i><p class="text-xs text-stone-600">Toca para subir imagen</p></div>`}
+          </div>
+          ${p&&p.imagen?`<button onclick="event.stopPropagation();clearImg()" class="text-xs text-red-400 mt-1 font-medium">Quitar imagen</button>`:''}
+        </div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Nombre del producto *</label><input type="text" id="f-nombre" class="input-field" placeholder="Ej: Nevera Samsung 14 pies" value="${p?p.nombre:''}"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Precio *</label><input type="number" id="f-precio" class="input-field" placeholder="0" inputmode="numeric" value="${p?p.precio:''}"></div>
+          <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Garantía</label><input type="text" id="f-garantia" class="input-field" placeholder="Ej: 1 año" value="${p?p.garantia:''}"></div>
+        </div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-2 block">Categoría *</label>
+          <div class="grid grid-cols-4 gap-2" id="f-cats">${catHtml}</div>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-xl bg-white/5">
+          <div><p class="text-sm font-semibold">Disponible</p><p class="text-xs text-stone-500">El producto está en stock</p></div>
+          <div class="toggle ${p?p.disponible?'on':'':'on'}" id="f-disp" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div id="f-llegada-wrap" class="${p&&p.disponible?'hidden':''}"><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Tiempo de llegada</label><input type="text" id="f-llegada" class="input-field" placeholder="Ej: 5 días hábiles" value="${p?p.tiempoLlegada:''}"></div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Descripción</label><textarea id="f-desc" class="input-field" placeholder="Describe el producto..." rows="3">${p?p.descripcion:''}</textarea></div>
+        <div class="flex items-center justify-between p-4 rounded-xl bg-white/5">
+          <div><p class="text-sm font-semibold">Destacado</p><p class="text-xs text-stone-500">Mostrar etiqueta de destacado</p></div>
+          <div class="toggle ${p&&p.destacado?'on':''}" id="f-dest" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <button onclick="saveProduct()" class="btn-primary">${p?'Guardar Cambios':'Agregar Producto'}</button>
+      </div>
+    </div>`;
+  openModal(html);
+  // Observar toggle de disponibilidad
+  setTimeout(()=>{
+    const disp=document.getElementById('f-disp');
+    if(disp){
+      new MutationObserver(()=>{
+        document.getElementById('f-llegada-wrap').classList.toggle('hidden',disp.classList.contains('on'));
+      }).observe(disp,{attributes:true,attributeFilter:['class']});
+    }
+  },100);
+}
+let selCatVal='';
+function selCat(c,el){
+  selCatVal=c;
+  document.querySelectorAll('#f-cats .cat-sel').forEach(e=>{
+    e.classList.remove('selected');
+    e.style.borderColor='';e.style.color='';
+  });
+  el.classList.add('selected');
+  const info=CATS[c];
+  if(info){el.style.borderColor=info.c;el.style.color=info.c;}
+}
+function onFile(e){
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>500000){toast('La imagen es muy grande (máx 500KB)','error');e.target.value='';return;}
+  const reader=new FileReader();
+  reader.onload=function(ev){S.imgTemp=ev.target.result;const prev=document.getElementById('img-prev');prev.innerHTML=`<img src="${S.imgTemp}" id="img-prev-img">`;};
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+function clearImg(){S.imgTemp='';const prev=document.getElementById('img-prev');prev.innerHTML=`<div class="text-center" id="img-prev-ph"><i data-lucide="image-plus" class="w-8 h-8 text-stone-600 mx-auto mb-1"></i><p class="text-xs text-stone-600">Toca para subir imagen</p></div>`;lucide.createIcons();}
+
+function saveProduct(){
+  const nombre=document.getElementById('f-nombre').value.trim();
+  const precio=parseInt(document.getElementById('f-precio').value);
+  const garantia=document.getElementById('f-garantia').value.trim();
+  const disp=document.getElementById('f-disp').classList.contains('on');
+  const llegada=document.getElementById('f-llegada').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
+  const dest=document.getElementById('f-dest').classList.contains('on');
+  const cat=selCatVal||(S.editId?D.productos.find(x=>x.id===S.editId)?.categoria:'');
+  if(!nombre){toast('Ingresa el nombre del producto','error');return;}
+  if(!precio||precio<=0){toast('Ingresa un precio válido','error');return;}
+  if(!cat){toast('Selecciona una categoría','error');return;}
+  if(S.editId){
+    const p=D.productos.find(x=>x.id===S.editId);
+    if(p){Object.assign(p,{nombre,precio,garantia,disponible:disp,tiempoLlegada:llegada,descripcion:desc,destacado:dest,categoria:cat});if(S.imgTemp)p.imagen=S.imgTemp;}
+    toast('Producto actualizado','success');
+  }else{
+    D.productos.push({id:'p'+Date.now(),nombre,precio,categoria:cat,disponible:disp,tiempoLlegada:llegada,garantia,descripcion:desc,imagen:S.imgTemp||'',destacado:dest});
+    toast('Producto agregado','success');
+  }
+  save();closeModal();renderAdmProducts();S.imgTemp='';S.editId=null;selCatVal='';
+}
+
+function deleteProd(id){
+  const p=D.productos.find(x=>x.id===id);if(!p)return;
+  openModal(`<div class="p-5">
+    <div class="text-center mb-5"><div class="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-3"><i data-lucide="trash-2" class="w-7 h-7 text-red-400"></i></div><h3 class="text-lg font-bold mb-1">Eliminar Producto</h3><p class="text-stone-400 text-sm">¿Seguro que quieres eliminar <strong>${p.nombre}</strong>?</p></div>
+    <button onclick="confirmDelete('${id}')" class="btn-danger mb-2">Sí, Eliminar</button>
+    <button onclick="closeModal()" class="btn-secondary">Cancelar</button>
+  </div>`);
+}
+function confirmDelete(id){D.productos=D.productos.filter(x=>x.id!==id);save();closeModal();renderAdmProducts();toast('Producto eliminado','info');}
+
+// ========== ADMIN - ENCARGOS ==========
+function renderAdmOrders(){
+  renderStats();
+  const list=document.getElementById('adm-ord-list');
+  const empty=document.getElementById('adm-ord-empty');
+  if(!D.encargos.length){list.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  list.innerHTML=D.encargos.map(o=>{
+    const e=ESTADOS[o.estado]||ESTADOS.pendiente;
+    return `<div class="order-card mb-3">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <p class="text-sm font-bold">${o.productoNombre}</p>
+          <p class="text-xs text-stone-500">${o.nombre} · ${o.telefono}</p>
+        </div>
+        <span class="text-xs font-bold px-2 py-1 rounded-md flex-shrink-0" style="background:${e.c}15;color:${e.c}">${e.l}</span>
+      </div>
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-stone-500">${o.fecha}</span>
+        <span class="text-sm font-bold text-orange-500">${fmt(o.total)} (${o.cantidad}x)</span>
+      </div>
+      ${o.nota?`<p class="text-xs text-stone-400 mb-2">Nota: ${o.nota}</p>`:''}
+      <div class="flex gap-2 pt-2 border-t border-white/5">
+        <select onchange="changeStatus('${o.id}',this.value)" class="input-field text-xs py-2" style="flex:1">
+          ${Object.entries(ESTADOS).map(([k,v])=>`<option value="${k}" ${o.estado===k?'selected':''}>${v.l}</option>`).join('')}
+        </select>
+        <button onclick="deleteOrder('${o.id}')" class="qty-btn" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2)"><i data-lucide="trash-2" class="w-3.5 h-3.5 text-red-400"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+function changeStatus(id,st){const o=D.encargos.find(x=>x.id===id);if(o){o.estado=st;save();renderAdmOrders();toast('Estado actualizado','success');}}
+function deleteOrder(id){D.encargos=D.encargos.filter(x=>x.id!==id);save();renderAdmOrders();toast('Encargo eliminado','info');}
+
+// ========== ADMIN - CONFIGURACIÓN ==========
+function renderAdmConfig(){
+  renderStats();
+  document.getElementById('adm-conf-body').innerHTML=`
+    <div class="order-card">
+      <h3 class="text-sm font-bold mb-4 flex items-center gap-2"><i data-lucide="store" class="w-4 h-4 text-orange-500"></i> Tienda</h3>
+      <div class="space-y-3">
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Nombre de la tienda</label><input type="text" id="c-nombre" class="input-field" value="${D.config.nombreTienda}"></div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Teléfono de WhatsApp (sin +)</label><input type="tel" id="c-tel" class="input-field" value="${D.config.telefono}" inputmode="tel" placeholder="Ej: 584141234567"></div>
+        <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">Símbolo de moneda</label><input type="text" id="c-moneda" class="input-field" value="${D.config.moneda}" maxlength="3"></div>
+      </div>
+    </div>
+    <div class="order-card">
+      <h3 class="text-sm font-bold mb-4 flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4 text-orange-500"></i> Mensaje de bienvenida</h3>
+      <textarea id="c-msg" class="input-field" rows="3">${D.config.mensajeBienvenida}</textarea>
+    </div>
+    <div class="order-card">
+      <h3 class="text-sm font-bold mb-4 flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4 text-orange-500"></i> Seguridad</h3>
+      <div><label class="text-xs text-stone-500 font-semibold uppercase tracking-wider mb-1 block">PIN de administración</label><input type="password" id="c-pin" class="input-field" value="${D.config.pin}" maxlength="6" inputmode="numeric"></div>
+    </div>
+    <button onclick="saveConfig()" class="btn-primary flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> Guardar Cambios</button>
+    <div class="order-card">
+      <h3 class="text-sm font-bold mb-3 flex items-center gap-2"><i data-lucide="database" class="w-4 h-4 text-orange-500"></i> Datos</h3>
+      <p class="text-xs text-stone-500 mb-3">Los datos se guardan en el navegador de tu teléfono. Para compartir la tienda con tu amigo, pueden copiar los datos y pegarlos en su navegador.</p>
+      <button onclick="exportData()" class="btn-secondary mb-2 flex items-center justify-center gap-2"><i data-lucide="download" class="w-4 h-4"></i> Copiar Datos</button>
+      <button onclick="importDataUI()" class="btn-secondary flex items-center justify-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> Pegar Datos</button>
+    </div>
+    <button onclick="resetData()" class="btn-danger flex items-center justify-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Restaurar Datos de Fábrica</button>`;
+  lucide.createIcons();
+}
+function saveConfig(){
+  D.config.nombreTienda=document.getElementById('c-nombre').value.trim()||D.config.nombreTienda;
+  D.config.telefono=document.getElementById('c-tel').value.trim()||D.config.telefono;
+  D.config.moneda=document.getElementById('c-moneda').value.trim()||D.config.moneda;
+  D.config.mensajeBienvenida=document.getElementById('c-msg').value.trim();
+  const newPin=document.getElementById('c-pin').value.trim();
+  if(newPin&&newPin.length>=4)D.config.pin=newPin;
+  save();renderAdmConfig();renderHome();
+  toast('Configuración guardada','success');
+}
+function exportData(){
+  const text=LZString.compressToUTF16(JSON.stringify(D));
+  navigator.clipboard.writeText(text).then(()=>toast('Datos copiados al portapapeles','success')).catch(()=>{
+    openModal(`<div class="p-5"><h3 class="text-lg font-bold mb-3">Copiar Datos</h3><p class="text-xs text-stone-500 mb-3">Selecciona todo el texto y cópialo:</p><textarea class="input-field text-[10px]" rows="6" readonly onclick="this.select()">${text}</textarea><button onclick="closeModal()" class="btn-secondary mt-3">Cerrar</button></div>`);
+  });
+}
+function importDataUI(){
+  openModal(`<div class="p-5"><h3 class="text-lg font-bold mb-3">Pegar Datos</h3><p class="text-xs text-stone-500 mb-3">Pega aquí los datos que te enviaron:</p><textarea id="imp-data" class="input-field text-[10px]" rows="6" placeholder="Pega aquí los datos..."></textarea><button onclick="doImport()" class="btn-primary mt-3">Importar Datos</button><button onclick="closeModal()" class="btn-secondary mt-2">Cancelar</button></div>`);
+}
+function doImport(){
+  const text=document.getElementById('imp-data').value.trim();
+  if(!text){toast('No hay datos para importar','error');return;}
+  try{const obj=JSON.parse(LZString.decompressFromUTF16(text));if(obj.config&&obj.productos){D=obj;save();closeModal();toast('Datos importados correctamente','success');renderHome();}else{toast('Los datos no son válidos','error');}}catch(e){toast('Error: los datos no son válidos','error');}
+}
+function resetData(){
+  openModal(`<div class="p-5 text-center">
+    <div class="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-3"><i data-lucide="alert-triangle" class="w-7 h-7 text-red-400"></i></div>
+    <h3 class="text-lg font-bold mb-1">Restaurar Datos</h3><p class="text-stone-400 text-sm mb-5">Se eliminarán todos los productos, encargos y configuraciones. Esta acción no se puede deshacer.</p>
+    <button onclick="doReset()" class="btn-danger mb-2">Sí, Restaurar Todo</button>
+    <button onclick="closeModal()" class="btn-secondary">Cancelar</button>
+  </div>`);
+}
+function doReset(){D=JSON.parse(JSON.stringify(DATOS_INICIALES));save();closeModal();renderAdmin();renderHome();toast('Datos restaurados','info');}
+
+// ========== ADMIN - RENDER PRINCIPAL ==========
+function renderAdmin(){renderAdmProducts();}
+
+// ========== INICIALIZACIÓN ==========
+function init(){
+  renderHome();
+  lucide.createIcons();
+  // Mostrar mensaje de bienvenida la primera vez
+  if(!localStorage.getItem('eh_welcomed')){
+    setTimeout(()=>{toast(D.config.mensajeBienvenida,'info');localStorage.setItem('eh_welcomed','1');},800);
+  }
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+  </html>
